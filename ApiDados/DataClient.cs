@@ -25,7 +25,7 @@ namespace ApiDados
         public DataClient(string serverAddress, string context, string userName, string password)
         {
             this.ServerAddress = serverAddress;
-                this.Context = context;
+            this.Context = context;
             this.UserName = userName;
             this.Password = password;
         }

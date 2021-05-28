@@ -1,0 +1,38 @@
+﻿<?xml version="1.0" encoding="utf-8"?><Database Name="BDTRANSF" Class="DespesasDataContext" xmlns="http://schemas.microsoft.com/linqtosql/dbml/2007">
+  <Connection Mode="AppSettings" ConnectionString="Data Source=DEVBD;Initial Catalog=BDTRANSF;Integrated Security=True" SettingsObjectName="ApiDados.Properties.Settings" SettingsPropertyName="BDTRANSFConnectionString" Provider="System.Data.SqlClient" />
+  <Table Name="dbo.tblDadosContabeisImovel20210526" Member="tblDadosContabeisImovel20210526s">
+    <Type Name="tblDadosContabeisImovel20210526">
+      <Column Name="Contrato" Type="System.String" DbType="NVarChar(255)" CanBeNull="true" />
+      <Column Name="baseprovisao" Type="System.String" DbType="NVarChar(255)" CanBeNull="true" />
+      <Column Name="Status1" Type="System.String" DbType="NVarChar(255)" CanBeNull="true" />
+      <Column Name="Status2" Type="System.String" DbType="NVarChar(255)" CanBeNull="true" />
+      <Column Name="TipoImovel" Type="System.String" DbType="NVarChar(255)" CanBeNull="true" />
+      <Column Name="UF" Type="System.String" DbType="NVarChar(255)" CanBeNull="true" />
+      <Column Name="CIDADE" Type="System.String" DbType="NVarChar(255)" CanBeNull="true" />
+      <Column Name="VALOR_TOTAL_IPTU_2021" Type="System.Double" DbType="Float" CanBeNull="true" />
+      <Column Name="VALOR_PGTO_01_2021" Type="System.Double" DbType="Float" CanBeNull="true" />
+      <Column Name="VALOR_PGTO_02_2021" Type="System.Double" DbType="Float" CanBeNull="true" />
+      <Column Name="VALOR_PGTO_03_2021" Type="System.Double" DbType="Float" CanBeNull="true" />
+      <Column Name="VALOR_PGTO_04_2021" Type="System.Double" DbType="Float" CanBeNull="true" />
+      <Column Name="TOTAL_PAGTO_IPTU_2021" Type="System.Double" DbType="Float" CanBeNull="true" />
+      <Column Name="VALOR_TOTAL_DIVIDA" Type="System.Double" DbType="Float" CanBeNull="true" />
+      <Column Name="VALOR_TOTAL_DIVIDA_2" Type="System.Double" DbType="Float" CanBeNull="true" />
+      <Column Name="VALOR_TOTAL_TOTAL" Type="System.Double" DbType="Float" CanBeNull="true" />
+      <Column Name="VALOR_PGTO_DEBITO_ATRASADO" Type="System.String" DbType="NVarChar(255)" CanBeNull="true" />
+      <Column Name="PREVISAO" Type="System.String" DbType="NVarChar(255)" CanBeNull="true" />
+      <Column Name="PERIODO_REFIS_INICIO" Type="System.Double" DbType="Float" CanBeNull="true" />
+      <Column Name="PERIODO_REFIS_TERMINO" Type="System.String" DbType="NVarChar(255)" CanBeNull="true" />
+      <Column Name="VALOR_TAX_CONDOMINIAL_ESTIMATIVA" Type="System.Double" DbType="Float" CanBeNull="true" />
+      <Column Name="VALOR_TOTAL_DA_DIVIDA_CONDOMINIAL" Type="System.Double" DbType="Float" CanBeNull="true" />
+      <Column Name="VALOR_ESTIMADO_ATUALIZADO" Type="System.Double" DbType="Float" CanBeNull="true" />
+      <Column Name="VALOR_PGTO_DIVIDA" Type="System.Double" DbType="Float" CanBeNull="true" />
+      <Column Name="VALOR_PGTO_OUT_2020" Type="System.Double" DbType="Float" CanBeNull="true" />
+      <Column Name="VALOR_PGTO_NOV_2020" Type="System.Double" DbType="Float" CanBeNull="true" />
+      <Column Name="VALOR_PGTO_DEZ_2020" Type="System.Double" DbType="Float" CanBeNull="true" />
+      <Column Name="VALOR_PGTO_JAN_2021" Type="System.Double" DbType="Float" CanBeNull="true" />
+      <Column Name="VALOR_PGTO_FEV_2021" Type="System.Double" DbType="Float" CanBeNull="true" />
+      <Column Name="VALOR_PGTO_MAR_2021" Type="System.Double" DbType="Float" CanBeNull="true" />
+      <Column Name="VALOR_PGTO_ABR_2021" Type="System.Double" DbType="Float" CanBeNull="true" />
+    </Type>
+  </Table>
+</Database>

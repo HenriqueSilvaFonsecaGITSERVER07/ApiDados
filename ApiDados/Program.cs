@@ -20,37 +20,295 @@ namespace ApiDados
         static string senha = "Brasil07";
         static void Main(string[] args)
         {
+            DespesasDataContext dados = new DespesasDataContext();
+
+
+            List<tblDadosContabeisImovel20210526> list = dados.tblDadosContabeisImovel20210526s.Take(100).ToList();
+
+
+            foreach (var item in list)
+            {
+                SalvarDeDespesas(item);
+            }
+
+
+
             /*IMOVEL*/
-            //ReadView();
-            ReadRecord();          
+            ReadView();
+            //ReadRecord();          
             //SalvarImovel();
 
+            //SalvarDeDespesas();
+            //VisualizarDespesa();
+
             /*Lançamentos Financeiros*/
-            VisualizarLancamentosFinanceiros();
-            SalvarLacamentoFinanceiro();
-            AtualizaRecordLancamentoFinanceiro();
+            //VisualizarLancamentosFinanceiros();
+            //SalvarLacamentoFinanceiro();
+            //AtualizaRecordLancamentoFinanceiro();                 
+        }
 
-        }       
 
-        static public void VisualizarLancamentosFinanceiros()
-        {          
+
+        //private static void OpenSqlConnection(string connectionString)
+        //{
+        //    using (connection = new SqlConnection(connectionString))
+        //    {
+        //        connection.Open();
+        //        Console.WriteLine("ServerVersion: {0}", connection.ServerVersion);
+        //        Console.WriteLine("State: {0}", connection.State);
+        //    }
+        //}
+
+
+        /*============================================ IMOVEL ====================================================================*/
+        ///LEITURA DOS DADOS
+        static public void ReadView()
+        {
+            // ajuste o nome o servidor e porta. Em caso de dúvidas, consulte o link abaixo:  
+            // http://tdn.totvs.com/pages/releaseview.action?pageId=89620766    
+            string url = "http://agamenon.emgea.ativos:8051";
+
+            //importante passar no contexto o mesmo código de usuário usado para logar no webservice  
             string contexto = "CODSISTEMA=G;CODCOLIGADA=1;CODUSUARIO=x000417";
-           
+
+            //usuário e senha do aplicativo RM. O mesmo utilizado para logar no sistema e que tenha permissão de   
+            //acesso ao cadastro que deseja utilizar             
+
+            //string usuario = "x000417";
+            //string senha = "Brasil07";
+
+            //o filtro pode ser qualquer campo da visão, por exemplo CODCOLIGADA=1 AND CODFILIAL = 1  
             string filtro = "1=1";
 
             string recordData;
-          
-            DataClient dataclient = new DataClient(url, contexto, usuario, senha);          
-        
+
+            // Retorna as credenciais para acesso ao WS  
+            DataClient dataclient = new DataClient(url, contexto, usuario, senha);
+            // lê os dados da visão respeitando o filtro passado  
+
+            //Imovel
+            //DataSet ds = dataclient.ReadView("ImbImovelData", filtro, out recordData);
+
+            //Lançamentos Financeiros
             DataSet ds = dataclient.ReadView("FinLanDataBR", filtro, out recordData);
-           
+
+
+            //Pode utilizar o ds tipado para DataSet ou a variável recordData que possui o XML da solicitação   
             Console.WriteLine(recordData);
 
             Console.ReadLine();
         }
-               
+        static public void SalvarImovel()
+        {
+            string xml = @"<ImbImovel xmlns='http://tempuri.org/ImbImovel.xsd\'>  
+                       <XALGIMOVEL>
+                            <CODCOLIMOVEL>1</CODCOLIMOVEL>
+                            <CODIMOVEL>0</CODIMOVEL>
+                            <SITUACAOIMOVEL>0</SITUACAOIMOVEL>
+                            <IMOVELPROPRIO>0</IMOVELPROPRIO>
+                            <TIPOAREA>1</TIPOAREA>
+                            <VALORLOCACAOSUGERIDO>6.000,00</VALORLOCACAOSUGERIDO>
+                            <ACEITANEGOCIACAO>0</ACEITANEGOCIACAO>
+                            <DATACADASTRO>2021-05-25T00:00:00</DATACADASTRO>
+                            <CEP>71692000</CEP>
+                            <TIPOLOGRADOURO>1</TIPOLOGRADOURO>
+                            <HISTORICO>CADASTRO DE HISTÓRICO</HISTORICO>
+                            <DESCRUA>DESC TESTE</DESCRUA>
+                            <LOGRADOURO>SAMAMBAIA SUL</LOGRADOURO>
+                            <NUMERO>1</NUMERO>
+                            <BAIRRO>SAMAMBAIA</BAIRRO>
+                            <MUNICIPIO>00108</MUNICIPIO>
+                            <NOMEMUNICIPIO>DF</NOMEMUNICIPIO>
+                            <ESTADO>DF</ESTADO>
+                            <NOMEETD>Teste Cadastro Atualizado</NOMEETD>
+                            <PAIS>1</PAIS>
+                            <DESCPAIS>Brasil</DESCPAIS>
+                            <RECCREATEDBY>e000172</RECCREATEDBY>
+                            <RECCREATEDON>2021-05-25T10:42:12</RECCREATEDON>
+                            <RECMODIFIEDBY>e000172</RECMODIFIEDBY>
+                            <RECMODIFIEDON>2021-05-25T10:42:22</RECMODIFIEDON>
+                            <PERCENTPARTADM>100.0000</PERCENTPARTADM>
+                            <TIPOLOCACAOAREA>0</TIPOLOCACAOAREA>
+                            <CODCARTORIO>1</CODCARTORIO>
+                            <INTEGRACAOPORTAIS>0</INTEGRACAOPORTAIS>
+                            <METROQUADRADOLOCADO>0.0000</METROQUADRADOLOCADO>
+                            <METROQUADRADODISPONIVEL>0.0000</METROQUADRADODISPONIVEL>
+                            <METROQUADRADOLOCAVEL>0.0000</METROQUADRADOLOCAVEL>
+                            <METROQUADRADORESERVADO>0.0000</METROQUADRADORESERVADO>
+                            <REFLANCAMENTO>1</REFLANCAMENTO>
+                            <LANCAMENTOFINANCEIRO>1</LANCAMENTOFINANCEIRO>
+                          </XALGIMOVEL>
+                    </ImbImovel>";
+
+            //importante passar no contexto o mesmo código de usuário usado para logar no webservice
+            string contexto = "CODSISTEMA=G;CODCOLIGADA=1;CODUSUARIO={usuario}";
+
+            // Retorna as credenciais para acesso ao WS
+            DataClient dataclient = new DataClient(url, contexto, usuario, senha);
+
+            string[] retorno = dataclient.SaveRecord("ImbImovelData", xml);
+
+            Console.WriteLine(retorno[0].ToString());
+            Console.Read();
+        }
+        static public void ReadRecord()
+        {
+            //importante passar no contexto o mesmo código de usuário usado para logar no webservice
+            string contexto = "CODSISTEMA=G;CODCOLIGADA=1;CODUSUARIO={usuario}";
+
+            string recordData;
+            // Retorna as credenciais para acesso ao WS
+            DataClient dataclient = new DataClient(url, contexto, usuario, senha);
+            //O ReadRecord retorna o registro da edição do cadastro RM respeitando a chave primária
+            DataSet ds = dataclient.ReadRecord("ImbImovelContratoAdmData", "0;0;0;0;0", out recordData);
+            // Pode utilizar o ds tipado para DataSet ou a variável recordData que possui o XML da solicitação
+            Console.WriteLine(recordData);
+            Console.Read();
+        }
+
+        /*============================================ DEPESA ====================================================================*/      
+
+        static public void VisualizarDespesa()
+        {
+            string contexto = "CODSISTEMA=G;CODCOLIGADA=1;CODUSUARIO=x000417";
+
+            string filtro = "1=1";
+
+            string recordData;
+
+            DataClient dataclient = new DataClient(url, contexto, usuario, senha);
+
+            DataSet ds = dataclient.ReadView("ImbDespesaAluguelData", filtro, out recordData);
+
+            Console.WriteLine(recordData);
+
+            Console.ReadLine();
+        }
+
+
+        static public void SalvarDeDespesas(tblDadosContabeisImovel20210526 item)
+        {
+
+            string xml = @"<ImbDespesaAluguelData xmlns='http://tempuri.org/ImbDespesaAluguelData.xsd\'>
+               <XDESPESA>        
+                     <CODCOLIGADA>1</CODCOLIGADA> 
+                     <CODDESPESA>0</CODDESPESA>
+                	<DESCDESPESA>Teste</DESCDESPESA>
+                	<ORIGEM>1</ORIGEM>
+                	<CODPARAMMVTO>1</CODPARAMMVTO>
+                	<CODTIPODESPESA>2</CODTIPODESPESA> 
+                	<NUMPARCELA>1</NUMPARCELA> 
+                	<PERMITEREEMBOLSO>f</PERMITEREEMBOLSO> 
+                	<CODREGRAREEMBOLSO> </CODREGRAREEMBOLSO> 
+                	<NUMPARCELAREEMBOLSO>0</NUMPARCELAREEMBOLSO> 
+                	<CODCOLCFO>0</CODCOLCFO> 
+                	<CODCFO>F00786</CODCFO>                   
+                	<CODIMOVEL>2</CODIMOVEL> 
+                	<IDINSCRICAOMUNICIPAL></IDINSCRICAOMUNICIPAL> 
+                	<COMPETENCIA>2021-05-01 00:00:00.0000000</COMPETENCIA> 
+                	<STATUS>0</STATUS> 
+                	<NUMERODOCUMENTO>I20210000001</NUMERODOCUMENTO> 
+                	<VALORAVISTA>1000.0000</VALORAVISTA> 
+                	<VALORAPRAZO>1200.0000</VALORAPRAZO>
+                	<PRIMEIROVENCIMENTO>2021-05-31 00:00:00.0000000</PRIMEIROVENCIMENTO> 
+                    <INTERVALODIAS> </INTERVALODIAS> 
+                	<TIPOVALORDESPESA>2</TIPOVALORDESPESA>
+                	<TIPOVALORREEMBOLSO>1</TIPOVALORREEMBOLSO> 
+                	<IDPARAMFIN></IDPARAMFIN> 
+                	<COD_PESS_EMPR> </COD_PESS_EMPR> 
+                	<NUM_UNID></NUM_UNID>
+                	<NUM_SUB_UNID></NUM_SUB_UNID> 
+                	<INTERVALODIASREEMBOLSO></INTERVALODIASREEMBOLSO>
+                	<ANOEXERCICIO>2021</ANOEXERCICIO> 
+                	<CODSEGURO></CODSEGURO> 
+                	<PRIMEIROVCTOREEMBOLSO>0001-01-01 00:00:00.0000000</PRIMEIROVCTOREEMBOLSO> 
+                    <PERIODICIDADE>1</PERIODICIDADE>
+                	<PERIODICIDADEREEMBOLSO>1</PERIODICIDADEREEMBOLSO>
+            </XDESPESA>  
+        </ImbDespesaAluguelData>";
+
+            string contexto = "CODSISTEMA=G;CODCOLIGADA=1;CODUSUARIO={usuario}";
+
+            DataClient dataclient = new DataClient(url, contexto, usuario, senha);
+
+            string[] retorno = dataclient.SaveRecord("ImbDespesaAluguelData", xml);
+
+            Console.WriteLine(retorno[0].ToString());
+            Console.Read();
+        }
+
+
+        //static public void SalvarDeDespesas()
+        //{  
+
+        //    string xml = @"<ImbDespesaAluguelData xmlns='http://tempuri.org/ImbDespesaAluguelData.xsd\'>
+        //       <XDESPESA>        
+        //             <CODCOLIGADA>1</CODCOLIGADA> 
+        //             <CODDESPESA>0</CODDESPESA>
+        //        	<DESCDESPESA>Teste</DESCDESPESA>
+        //        	<ORIGEM>1</ORIGEM>
+        //        	<CODPARAMMVTO>1</CODPARAMMVTO>
+        //        	<CODTIPODESPESA>2</CODTIPODESPESA> 
+        //        	<NUMPARCELA>1</NUMPARCELA> 
+        //        	<PERMITEREEMBOLSO>f</PERMITEREEMBOLSO> 
+        //        	<CODREGRAREEMBOLSO> </CODREGRAREEMBOLSO> 
+        //        	<NUMPARCELAREEMBOLSO>0</NUMPARCELAREEMBOLSO> 
+        //        	<CODCOLCFO>0</CODCOLCFO> 
+        //        	<CODCFO>F00786</CODCFO>                   
+        //        	<CODIMOVEL>2</CODIMOVEL> 
+        //        	<IDINSCRICAOMUNICIPAL></IDINSCRICAOMUNICIPAL> 
+        //        	<COMPETENCIA>2021-05-01 00:00:00.0000000</COMPETENCIA> 
+        //        	<STATUS>0</STATUS> 
+        //        	<NUMERODOCUMENTO>I20210000001</NUMERODOCUMENTO> 
+        //        	<VALORAVISTA>1000.0000</VALORAVISTA> 
+        //        	<VALORAPRAZO>1200.0000</VALORAPRAZO>
+        //        	<PRIMEIROVENCIMENTO>2021-05-31 00:00:00.0000000</PRIMEIROVENCIMENTO> 
+        //            <INTERVALODIAS> </INTERVALODIAS> 
+        //        	<TIPOVALORDESPESA>2</TIPOVALORDESPESA>
+        //        	<TIPOVALORREEMBOLSO>1</TIPOVALORREEMBOLSO> 
+        //        	<IDPARAMFIN></IDPARAMFIN> 
+        //        	<COD_PESS_EMPR> </COD_PESS_EMPR> 
+        //        	<NUM_UNID></NUM_UNID>
+        //        	<NUM_SUB_UNID></NUM_SUB_UNID> 
+        //        	<INTERVALODIASREEMBOLSO></INTERVALODIASREEMBOLSO>
+        //        	<ANOEXERCICIO>2021</ANOEXERCICIO> 
+        //        	<CODSEGURO></CODSEGURO> 
+        //        	<PRIMEIROVCTOREEMBOLSO>0001-01-01 00:00:00.0000000</PRIMEIROVCTOREEMBOLSO> 
+        //            <PERIODICIDADE>1</PERIODICIDADE>
+        //        	<PERIODICIDADEREEMBOLSO>1</PERIODICIDADEREEMBOLSO>
+        //    </XDESPESA>  
+        //</ImbDespesaAluguelData>";         
+
+        //    string contexto = "CODSISTEMA=G;CODCOLIGADA=1;CODUSUARIO={usuario}";
+
+        //    DataClient dataclient = new DataClient(url, contexto, usuario, senha);
+
+        //    string[] retorno = dataclient.SaveRecord("ImbDespesaAluguelData", xml);
+
+        //    Console.WriteLine(retorno[0].ToString());
+        //    Console.Read();
+        //}
+
+        /*============================================ LANÇAMENTOS FINANCEIROS ====================================================================*/
+        static public void VisualizarLancamentosFinanceiros()
+        {
+            string contexto = "CODSISTEMA=G;CODCOLIGADA=1;CODUSUARIO=x000417";
+
+            string filtro = "1=1";
+
+            string recordData;
+
+            DataClient dataclient = new DataClient(url, contexto, usuario, senha);
+
+            DataSet ds = dataclient.ReadView("FinLanDataBR", filtro, out recordData);
+
+            Console.WriteLine(recordData);
+
+            Console.ReadLine();
+        }
+
         /// SALVANDO O CADASTRO E DADOS DO IMOVEL 
-        
+
 
         //CADASTRO DE LANÇAMENTOS FUNCIONANDO ALTERAR <NUMERODOCUMENTO>
         static public void SalvarLacamentoFinanceiro()
@@ -59,7 +317,7 @@ namespace ApiDados
               <FLAN>  
                 <CODCOLIGADA>1</CODCOLIGADA>  
                 <IDLAN>0</IDLAN>  
-                <NUMERODOCUMENTO>00006485</NUMERODOCUMENTO> 
+                <NUMERODOCUMENTO>1001064999</NUMERODOCUMENTO> 
                 <IPTE>27593344243334673000600000013557842760000015000</IPTE>  
                 <CNABNOSSONUMERO>00013550001355</CNABNOSSONUMERO>  
                 <NFOUDUP>0</NFOUDUP>  
@@ -112,7 +370,7 @@ namespace ApiDados
                 <SERIEDOCUMENTO>@@@</SERIEDOCUMENTO>  
                 <TIPOCONTABILLAN>0</TIPOCONTABILLAN>  
 
-                <HISTORICO>CADASTRO WENDER</HISTORICO>
+                <HISTORICO>Cadastro 2021 lançamentos</HISTORICO>
 
                 <CODMOEVALORORIGINAL>R$</CODMOEVALORORIGINAL>  
                 <LIBAUTORIZADA>0</LIBAUTORIZADA>  
@@ -223,9 +481,9 @@ namespace ApiDados
                 <IDLAN>0</IDLAN>  
               </FLANCOMPL>   
             </FinLAN>";
-            
+
             string contexto = "CODSISTEMA=G;CODCOLIGADA=1;CODUSUARIO={usuario}";
-           
+
             DataClient dataclient = new DataClient(url, contexto, usuario, senha);
 
             string[] retorno = dataclient.SaveRecord("FinLanDataBR", xml);
@@ -376,111 +634,45 @@ namespace ApiDados
         }
 
 
-        /*============================================ IMOVEL ====================================================================*/
-        ///LEITURA DOS DADOS
-        static public void ReadView()
-        {
-            // ajuste o nome o servidor e porta. Em caso de dúvidas, consulte o link abaixo:  
-            // http://tdn.totvs.com/pages/releaseview.action?pageId=89620766    
-            string url = "http://agamenon.emgea.ativos:8051";
 
-            //importante passar no contexto o mesmo código de usuário usado para logar no webservice  
-            string contexto = "CODSISTEMA=G;CODCOLIGADA=1;CODUSUARIO=x000417";
+        //static public void metododeteste()
+        //{
+        //    string xml = @"<ImbContratoAdmImovelProp xmlns='http://tempuri.org/ImbContratoAdmImovelProp.xsd'>  
+        //                  <XALGCONTRATOADMPROPRIETARIO>
+        //                  <CODCOLCONTADM>0</CODCOLCONTADM>
+        //                  <CODCONTRATOADM>0</CODCONTRATOADM>
+        //                  <CODCOLCFOPROP>0</CODCOLCFOPROP>
+        //                  <CODCFOPROP>0</CODCFOPROP>
+        //                  <IDPROPRIETARIO>0</IDPROPRIETARIO>
+        //                  <NOMEPROPRIETARIO>0</NOMEPROPRIETARIO>
+        //                  <PRINCIPALPROP>0</PRINCIPALPROP>
+        //                  <PERCENTPARTPROP>0</PERCENTPARTPROP>
+        //                  <DTENTRADA>2018-08-23T10:37:13.5325645</DTENTRADA>        
+        //                  <DTSAIDA>2018-08-23T10:37:13.5325645</DTSAIDA>                
+        //                  <SITUACAO>1</SITUACAO>                
+        //                  <RECCREATEDBY>0</RECCREATEDBY>                
+        //                  <RECCREATEDON>2018-08-23T10:37:13.5325645</RECCREATEDON>                        
+        //                  <RECMODIFIEDBY>0</RECMODIFIEDBY>                        
+        //                  <RECMODIFIEDON>2018-08-23T10:37:13.5325645</RECMODIFIEDON>                                
+        //                  <IDADITIVOALTERACAO>0</IDADITIVOALTERACAO>                                
+        //                  </XALGCONTRATOADMPROPRIETARIO>
+        //                  </ImbContratoAdmImovelProp> "; 
+        //                string contexto = "CODSISTEMA=G;CODCOLIGADA=1;CODUSUARIO={usuario}";
 
-            //usuário e senha do aplicativo RM. O mesmo utilizado para logar no sistema e que tenha permissão de   
-            //acesso ao cadastro que deseja utilizar             
+        //    DataClient dataclient = new DataClient(url, contexto, usuario, senha);
 
-            //string usuario = "x000417";
-            //string senha = "Brasil07";
+        //    string[] retorno = dataclient.SaveRecord("ImbContratoAdmImovelPropData", xml);
 
-            //o filtro pode ser qualquer campo da visão, por exemplo CODCOLIGADA=1 AND CODFILIAL = 1  
-            string filtro = "1=1";
+        //    Console.WriteLine(retorno[0].ToString());
+        //    Console.Read();
+        //}
 
-            string recordData;
-
-            // Retorna as credenciais para acesso ao WS  
-            DataClient dataclient = new DataClient(url, contexto, usuario, senha);
-            // lê os dados da visão respeitando o filtro passado  
-
-            //Imovel
-            //DataSet ds = dataclient.ReadView("ImbImovelData", filtro, out recordData);
-
-            //Lançamentos Financeiros
-            DataSet ds = dataclient.ReadView("FinLanDataBR", filtro, out recordData);
-
-
-            //Pode utilizar o ds tipado para DataSet ou a variável recordData que possui o XML da solicitação   
-            Console.WriteLine(recordData);
-
-            Console.ReadLine();
-        }
-        static public void SalvarImovel()
-        {
-            string xml = @"<ImbImovel xmlns='http://tempuri.org/ImbImovel.xsd\'>  
-                       <XALGIMOVEL>
-                            <CODCOLIMOVEL>1</CODCOLIMOVEL>
-                            <CODIMOVEL>0</CODIMOVEL>
-                            <SITUACAOIMOVEL>0</SITUACAOIMOVEL>
-                            <IMOVELPROPRIO>0</IMOVELPROPRIO>
-                            <TIPOAREA>1</TIPOAREA>
-                            <VALORLOCACAOSUGERIDO>0.00000000</VALORLOCACAOSUGERIDO>
-                            <ACEITANEGOCIACAO>0</ACEITANEGOCIACAO>
-                            <DATACADASTRO>2021-05-25T00:00:00</DATACADASTRO>
-                            <CEP>71692000</CEP>
-                            <TIPOLOGRADOURO>1</TIPOLOGRADOURO>
-                            <DESCRUA>Novo 4Teste 25052021</DESCRUA>
-                            <LOGRADOURO>Novo Teste4 25052021</LOGRADOURO>
-                            <NUMERO>1</NUMERO>
-                            <BAIRRO>Novo Teste 25052021</BAIRRO>
-                            <MUNICIPIO>00108</MUNICIPIO>
-                            <NOMEMUNICIPIO>Novo Teste 25052021</NOMEMUNICIPIO>
-                            <ESTADO>DF</ESTADO>
-                            <NOMEETD>Novo Teste 25052021</NOMEETD>
-                            <PAIS>1</PAIS>
-                            <DESCPAIS>Brasil</DESCPAIS>
-                            <RECCREATEDBY>e000172</RECCREATEDBY>
-                            <RECCREATEDON>2021-05-25T10:42:12</RECCREATEDON>
-                            <RECMODIFIEDBY>e000172</RECMODIFIEDBY>
-                            <RECMODIFIEDON>2021-05-25T10:42:22</RECMODIFIEDON>
-                            <PERCENTPARTADM>100.0000</PERCENTPARTADM>
-                            <TIPOLOCACAOAREA>0</TIPOLOCACAOAREA>
-                            <CODCARTORIO>1</CODCARTORIO>
-                            <INTEGRACAOPORTAIS>0</INTEGRACAOPORTAIS>
-                            <METROQUADRADOLOCADO>0.0000</METROQUADRADOLOCADO>
-                            <METROQUADRADODISPONIVEL>0.0000</METROQUADRADODISPONIVEL>
-                            <METROQUADRADOLOCAVEL>0.0000</METROQUADRADOLOCAVEL>
-                            <METROQUADRADORESERVADO>0.0000</METROQUADRADORESERVADO>
-                          </XALGIMOVEL>
-                    </ImbImovel>";
-
-            //importante passar no contexto o mesmo código de usuário usado para logar no webservice
-            string contexto = "CODSISTEMA=G;CODCOLIGADA=1;CODUSUARIO={usuario}";
-
-            // Retorna as credenciais para acesso ao WS
-            DataClient dataclient = new DataClient(url, contexto, usuario, senha);
-
-            string[] retorno = dataclient.SaveRecord("ImbImovelData", xml);
-
-            Console.WriteLine(retorno[0].ToString());
-            Console.Read();
-        }
-
-        static public void ReadRecord()
-        {
-            //importante passar no contexto o mesmo código de usuário usado para logar no webservice
-            string contexto = "CODSISTEMA=G;CODCOLIGADA=1;CODUSUARIO={usuario}";
-
-            string recordData;
-            // Retorna as credenciais para acesso ao WS
-            DataClient dataclient = new DataClient(url, contexto, usuario, senha);
-            //O ReadRecord retorna o registro da edição do cadastro RM respeitando a chave primária
-            DataSet ds = dataclient.ReadRecord("ImbImovelContratoAdmData", "0;0;0;0;0", out recordData);
-            // Pode utilizar o ds tipado para DataSet ou a variável recordData que possui o XML da solicitação
-            Console.WriteLine(recordData);
-            Console.Read();
-        }
 
     }
 }
+
+
+
+
 
 
