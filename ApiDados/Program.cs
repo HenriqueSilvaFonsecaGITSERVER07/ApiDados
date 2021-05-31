@@ -22,9 +22,7 @@ namespace ApiDados
         {
             DespesasDataContext dados = new DespesasDataContext();
 
-
             List<tblDadosContabeisImovel20210526> list = dados.tblDadosContabeisImovel20210526s.Take(10).ToList();
-
 
             foreach (var item in list)
             {
@@ -35,10 +33,8 @@ namespace ApiDados
             ReadView();
             //ReadRecord();          
             //SalvarImovel();
-
             //SalvarDeDespesas();
             //VisualizarDespesa();
-
             /*Lançamentos Financeiros*/
             //VisualizarLancamentosFinanceiros();
             //SalvarLacamentoFinanceiro();
