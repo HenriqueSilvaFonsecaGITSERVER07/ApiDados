@@ -31,7 +31,6 @@ namespace ApiDados
                 SalvarDeDespesas(item);
             }
 
-
             /*IMOVEL*/
             ReadView();
             //ReadRecord();          
