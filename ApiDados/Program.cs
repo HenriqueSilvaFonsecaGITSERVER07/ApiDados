@@ -45,7 +45,6 @@ namespace ApiDados
         }
 
 
-
         static public void InserirDespesasImoveis()
         {
             string contexto = "CODSISTEMA=G;CODCOLIGADA=1;CODUSUARIO={usuario}";
@@ -140,17 +139,6 @@ namespace ApiDados
             w.WriteLine($"  :{logMessage}");
             w.WriteLine("--------------------------------------------------------------");
         }
-
-
-
-
-
-
-
-
-
-
-
 
         //private static void OpenSqlConnection(string connectionString)
         //{
@@ -270,7 +258,6 @@ namespace ApiDados
         }
 
         /*============================================ DEPESA ====================================================================*/
-
         static public void VisualizarDespesa()
         {
             string contexto = "CODSISTEMA=G;CODCOLIGADA=1;CODUSUARIO=x000417";
@@ -287,7 +274,6 @@ namespace ApiDados
 
             Console.ReadLine();
         }
-
 
         static public void SalvarDeDespesas(tblCargaImoveisDadosCompletosDespesas202105311 item, XALGIMOVEL imovel, int tipoValorDespesa)
         {
@@ -345,10 +331,7 @@ namespace ApiDados
 
             Console.WriteLine(retorno[0].ToString());
             Console.Read();
-        }
-
-
-     
+        }     
 
         /*============================================ LANÇAMENTOS FINANCEIROS ====================================================================*/
         static public void VisualizarLancamentosFinanceiros()
@@ -693,7 +676,6 @@ namespace ApiDados
             Console.WriteLine(retorno[0].ToString());
             Console.Read();
         }
-
 
 
         //static public void metododeteste()
