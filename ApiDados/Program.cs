@@ -23,14 +23,13 @@ namespace ApiDados
             DespesasDataContext dados = new DespesasDataContext();
 
 
-            List<tblDadosContabeisImovel20210526> list = dados.tblDadosContabeisImovel20210526s.Take(100).ToList();
+            List<tblDadosContabeisImovel20210526> list = dados.tblDadosContabeisImovel20210526s.Take(10).ToList();
 
 
             foreach (var item in list)
             {
                 SalvarDeDespesas(item);
             }
-
 
 
             /*IMOVEL*/
@@ -166,7 +165,7 @@ namespace ApiDados
             Console.Read();
         }
 
-        /*============================================ DEPESA ====================================================================*/      
+        /*============================================ DEPESA ====================================================================*/
 
         static public void VisualizarDespesa()
         {
@@ -190,42 +189,42 @@ namespace ApiDados
         {
 
             string xml = @"<ImbDespesaAluguelData xmlns='http://tempuri.org/ImbDespesaAluguelData.xsd\'>
-               <XDESPESA>        
-                     <CODCOLIGADA>1</CODCOLIGADA> 
-                     <CODDESPESA>0</CODDESPESA>
-                	<DESCDESPESA>Teste</DESCDESPESA>
-                	<ORIGEM>1</ORIGEM>
-                	<CODPARAMMVTO>1</CODPARAMMVTO>
-                	<CODTIPODESPESA>2</CODTIPODESPESA> 
-                	<NUMPARCELA>1</NUMPARCELA> 
-                	<PERMITEREEMBOLSO>f</PERMITEREEMBOLSO> 
-                	<CODREGRAREEMBOLSO> </CODREGRAREEMBOLSO> 
-                	<NUMPARCELAREEMBOLSO>0</NUMPARCELAREEMBOLSO> 
-                	<CODCOLCFO>0</CODCOLCFO> 
-                	<CODCFO>F00786</CODCFO>                   
-                	<CODIMOVEL>2</CODIMOVEL> 
-                	<IDINSCRICAOMUNICIPAL></IDINSCRICAOMUNICIPAL> 
-                	<COMPETENCIA>2021-05-01 00:00:00.0000000</COMPETENCIA> 
-                	<STATUS>0</STATUS> 
-                	<NUMERODOCUMENTO>I20210000001</NUMERODOCUMENTO> 
-                	<VALORAVISTA>1000.0000</VALORAVISTA> 
-                	<VALORAPRAZO>1200.0000</VALORAPRAZO>
-                	<PRIMEIROVENCIMENTO>2021-05-31 00:00:00.0000000</PRIMEIROVENCIMENTO> 
-                    <INTERVALODIAS> </INTERVALODIAS> 
-                	<TIPOVALORDESPESA>2</TIPOVALORDESPESA>
-                	<TIPOVALORREEMBOLSO>1</TIPOVALORREEMBOLSO> 
-                	<IDPARAMFIN></IDPARAMFIN> 
-                	<COD_PESS_EMPR> </COD_PESS_EMPR> 
-                	<NUM_UNID></NUM_UNID>
-                	<NUM_SUB_UNID></NUM_SUB_UNID> 
-                	<INTERVALODIASREEMBOLSO></INTERVALODIASREEMBOLSO>
-                	<ANOEXERCICIO>2021</ANOEXERCICIO> 
-                	<CODSEGURO></CODSEGURO> 
-                	<PRIMEIROVCTOREEMBOLSO>0001-01-01 00:00:00.0000000</PRIMEIROVCTOREEMBOLSO> 
-                    <PERIODICIDADE>1</PERIODICIDADE>
-                	<PERIODICIDADEREEMBOLSO>1</PERIODICIDADEREEMBOLSO>
-            </XDESPESA>  
-        </ImbDespesaAluguelData>";
+               <XDESPESA>" +
+                    "<CODCOLIGADA>1 </CODCOLIGADA>" +
+                    "<CODDESPESA>0</CODDESPESA>" +
+                    "<DESCDESPESA>" + item.CIDADE + "</DESCDESPESA>" +
+                    "<ORIGEM>1</ORIGEM>" +
+                    "<CODPARAMMVTO>1</CODPARAMMVTO>" +
+                    "<CODTIPODESPESA>2</CODTIPODESPESA>" +
+                    "<NUMPARCELA>1</NUMPARCELA>" +
+                    "<PERMITEREEMBOLSO>f</PERMITEREEMBOLSO>" +
+                    "<CODREGRAREEMBOLSO> </CODREGRAREEMBOLSO>" +
+                    "<NUMPARCELAREEMBOLSO>0</NUMPARCELAREEMBOLSO>" +
+                    "<CODCOLCFO>0</CODCOLCFO>" +
+                    "<CODCFO>F00786</CODCFO>" +
+                    "<CODIMOVEL>2</CODIMOVEL>" +
+                    "<IDINSCRICAOMUNICIPAL></IDINSCRICAOMUNICIPAL>" +
+                    "<COMPETENCIA>2021-05-01 00:00:00.0000000</COMPETENCIA>" +
+                    "<STATUS>0</STATUS>" +
+                    "<NUMERODOCUMENTO>I20210000001</NUMERODOCUMENTO>" +
+                    "<VALORAVISTA>1000.0000</VALORAVISTA>" +
+                    "<VALORAPRAZO>1200.0000</VALORAPRAZO>" +
+                    "<PRIMEIROVENCIMENTO>2021-05-31 00:00:00.0000000</PRIMEIROVENCIMENTO>" +
+                    "<INTERVALODIAS> </INTERVALODIAS>" +
+                    "<TIPOVALORDESPESA>2</TIPOVALORDESPESA>" +
+                    "<TIPOVALORREEMBOLSO>1</TIPOVALORREEMBOLSO>" +
+                    "<IDPARAMFIN></IDPARAMFIN>" +
+                    "<COD_PESS_EMPR> </COD_PESS_EMPR>" +
+                    "<NUM_UNID></NUM_UNID>" +
+                    "<NUM_SUB_UNID></NUM_SUB_UNID>" +
+                    "<INTERVALODIASREEMBOLSO></INTERVALODIASREEMBOLSO>" +
+                    "<ANOEXERCICIO>2021</ANOEXERCICIO>" +
+                    "<CODSEGURO></CODSEGURO>" +
+                    "<PRIMEIROVCTOREEMBOLSO>0001-01-01 00:00:00.0000000</PRIMEIROVCTOREEMBOLSO>" +
+                    "<PERIODICIDADE>1</PERIODICIDADE>" +
+                    "<PERIODICIDADEREEMBOLSO>1</PERIODICIDADEREEMBOLSO>" +
+                    "</XDESPESA>" +
+        "</ImbDespesaAluguelData>";
 
             string contexto = "CODSISTEMA=G;CODCOLIGADA=1;CODUSUARIO={usuario}";
 
