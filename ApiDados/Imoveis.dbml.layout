@@ -1,0 +1,12 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<ordesignerObjectsDiagram dslVersion="1.0.0.0" absoluteBounds="0, 0, 11, 12" name="Imoveis">
+  <DataContextMoniker Name="/ImoveisDataContext" />
+  <nestedChildShapes>
+    <classShape Id="c2ba24f4-fb2f-4260-b02d-fd990aceecec" absoluteBounds="4.5, 0.5, 2, 11.1936669921875">
+      <DataClassMoniker Name="/ImoveisDataContext/XALGIMOVEL" />
+      <nestedChildShapes>
+        <elementListCompartment Id="dd0ca0b7-a0a5-463b-bb95-b76f8dd18591" absoluteBounds="4.515, 0.96, 1.9700000000000002, 10.6336669921875" name="DataPropertiesCompartment" titleTextColor="Black" itemTextColor="Black" />
+      </nestedChildShapes>
+    </classShape>
+  </nestedChildShapes>
+</ordesignerObjectsDiagram>

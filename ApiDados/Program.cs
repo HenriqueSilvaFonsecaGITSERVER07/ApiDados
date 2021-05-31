@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Data;
+using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -20,26 +21,134 @@ namespace ApiDados
         static string senha = "Brasil07";
         static void Main(string[] args)
         {
-            DespesasDataContext dados = new DespesasDataContext();
+            //DespesasDataContext dados = new DespesasDataContext();
 
-            List<tblDadosContabeisImovel20210526> list = dados.tblDadosContabeisImovel20210526s.Take(10).ToList();
+            //ImoveisDataContext dbImoveis = new ImoveisDataContext();
+            //List<tblCargaImoveisDadosCompletosDespesas202105311> list = dados.tblCargaImoveisDadosCompletosDespesas202105311s.Take(10).ToList();
 
-            foreach (var item in list)
+            //foreach (var item in list)
+            //{
+            //    SalvarDeDespesas(item);
+            //}
+
+            ///*IMOVEL*/
+            //ReadView();
+            ////ReadRecord();          
+            ////SalvarImovel();
+            ////SalvarDeDespesas();
+            ////VisualizarDespesa();
+            ///*Lançamentos Financeiros*/
+            ////VisualizarLancamentosFinanceiros();
+            ////SalvarLacamentoFinanceiro();
+            ////AtualizaRecordLancamentoFinanceiro();           
+            InserirDespesasImoveis();
+        }
+
+
+
+        static public void InserirDespesasImoveis()
+        {
+            string contexto = "CODSISTEMA=G;CODCOLIGADA=1;CODUSUARIO={usuario}";
+
+            //o filtro pode ser qualquer campo da visão, por exemplo CODCOLIGADA=1 AND CODFILIAL = 1  
+            string filtro = "1=1";
+
+            string recordData;
+
+            // Retorna as credenciais para acesso ao WS  
+            DataClient dataclient = new DataClient(url, contexto, usuario, senha);
+            // lê os dados da visão respeitando o filtro passado  
+            DataSet ds = dataclient.ReadView("ImbDespesaAluguelData", filtro, out recordData);
+
+            var result = ds.Tables[0].AsEnumerable().ToList();
+
+            DespesasDataContext dbDespesas = new DespesasDataContext();
+
+            ImoveisDataContext dbImoveis = new ImoveisDataContext();
+
+            List<tblCargaImoveisDadosCompletosDespesas202105311> listaDespesas = dbDespesas.tblCargaImoveisDadosCompletosDespesas202105311s.Take(230).ToList();
+
+            foreach (var item in listaDespesas)
             {
-                SalvarDeDespesas(item);
+                //var verificaCadastroDuplicado = result.Select(x => x.ItemArray[2].Equals(item.EMGEA_NumContrato)).FirstOrDefault();
+
+                var verificaCadastroDuplicado = result.Select(x => x.ItemArray[2].Equals(item.EMGEA_NumContrato.ToString())).FirstOrDefault();
+
+                if (verificaCadastroDuplicado)
+                {
+                    Console.ForegroundColor = ConsoleColor.Yellow;
+                    Console.WriteLine($"{DateTime.Now.ToLongTimeString()} {DateTime.Now.ToLongDateString()}");
+                    Console.WriteLine("Já existe uma despesa cadastrada para o contrato " + item.EMGEA_NumContrato);
+                    Console.WriteLine("--------------------------------------------------------------");
+                }
+                else
+                {
+                    int tipoValorDespesa = 1;
+
+                    var listaImoveis = dbImoveis.XALGIMOVELs.Where(x => x.DESCIMOVEL.Equals(item.EMGEA_NumContrato)).ToList();
+
+                    if (listaImoveis.Count == 1)
+                    {
+                        if (item.N_DE_PARCELAS > 1)
+                        {
+                            tipoValorDespesa = 2;
+                        }
+                        var imovel = listaImoveis.FirstOrDefault();
+
+                        SalvarDeDespesas(item, imovel, tipoValorDespesa);
+
+                    }
+                    else if (listaImoveis.Count > 1)
+                    {
+                        using (StreamWriter w = File.AppendText("Log _error.txt"))
+                        {
+                            Log("Existe mais de um imóvel para esse número de contrato " + item.EMGEA_NumContrato, w);
+                        }
+
+                        Console.ForegroundColor = ConsoleColor.Red;
+                        Console.WriteLine($"{DateTime.Now.ToLongTimeString()} {DateTime.Now.ToLongDateString()}");
+                        Console.WriteLine("Existe mais de um imóvel para esse número de contrato: " + item.EMGEA_NumContrato);
+                        Console.WriteLine("--------------------------------------------------------------");
+                    }
+                    else
+                    {
+                        using (StreamWriter w = File.AppendText("log.txt"))
+                        {
+                            Log("Não existe um imóvel cadastrado com esse número de contrato: " + item.EMGEA_NumContrato, w);
+                        }
+
+                        Console.ForegroundColor = ConsoleColor.Red;
+                        Console.WriteLine($"{DateTime.Now.ToLongTimeString()} {DateTime.Now.ToLongDateString()}");
+                        Console.WriteLine("Não existe um imóvel cadastrado com esse número de contrato: " + item.EMGEA_NumContrato);
+                        Console.WriteLine("--------------------------------------------------------------");
+                    }
+                }
+
             }
 
-            /*IMOVEL*/
-            ReadView();
-            //ReadRecord();          
-            //SalvarImovel();
-            //SalvarDeDespesas();
-            //VisualizarDespesa();
-            /*Lançamentos Financeiros*/
-            //VisualizarLancamentosFinanceiros();
-            //SalvarLacamentoFinanceiro();
-            //AtualizaRecordLancamentoFinanceiro();                 
+            Console.ForegroundColor = ConsoleColor.Green;
+            Console.WriteLine($"{DateTime.Now.ToLongTimeString()} {DateTime.Now.ToLongDateString()}");
+            Console.WriteLine("Finalizado");
+            Console.WriteLine("--------------------------------------------------------------");
+            Console.Read();
         }
+
+        public static void Log(string logMessage, TextWriter w)
+        {
+            w.Write("\r\nLog importação de despesas do imóvel : ");
+            w.WriteLine($"{DateTime.Now.ToLongTimeString()} {DateTime.Now.ToLongDateString()}");
+            w.WriteLine($"  :{logMessage}");
+            w.WriteLine("--------------------------------------------------------------");
+        }
+
+
+
+
+
+
+
+
+
 
 
 
@@ -180,46 +289,53 @@ namespace ApiDados
         }
 
 
-        static public void SalvarDeDespesas(tblDadosContabeisImovel20210526 item)
+        static public void SalvarDeDespesas(tblCargaImoveisDadosCompletosDespesas202105311 item, XALGIMOVEL imovel, int tipoValorDespesa)
         {
 
-            string xml = @"<ImbDespesaAluguelData xmlns='http://tempuri.org/ImbDespesaAluguelData.xsd\'>
-               <XDESPESA>" +
-                    "<CODCOLIGADA>1 </CODCOLIGADA>" +
-                    "<CODDESPESA>0</CODDESPESA>" +
-                    "<DESCDESPESA>" + item.CIDADE + "</DESCDESPESA>" +
-                    "<ORIGEM>1</ORIGEM>" +
-                    "<CODPARAMMVTO>1</CODPARAMMVTO>" +
-                    "<CODTIPODESPESA>2</CODTIPODESPESA>" +
-                    "<NUMPARCELA>1</NUMPARCELA>" +
-                    "<PERMITEREEMBOLSO>f</PERMITEREEMBOLSO>" +
-                    "<CODREGRAREEMBOLSO> </CODREGRAREEMBOLSO>" +
-                    "<NUMPARCELAREEMBOLSO>0</NUMPARCELAREEMBOLSO>" +
-                    "<CODCOLCFO>0</CODCOLCFO>" +
-                    "<CODCFO>F00786</CODCFO>" +
-                    "<CODIMOVEL>2</CODIMOVEL>" +
-                    "<IDINSCRICAOMUNICIPAL></IDINSCRICAOMUNICIPAL>" +
-                    "<COMPETENCIA>2021-05-01 00:00:00.0000000</COMPETENCIA>" +
-                    "<STATUS>0</STATUS>" +
-                    "<NUMERODOCUMENTO>I20210000001</NUMERODOCUMENTO>" +
-                    "<VALORAVISTA>1000.0000</VALORAVISTA>" +
-                    "<VALORAPRAZO>1200.0000</VALORAPRAZO>" +
-                    "<PRIMEIROVENCIMENTO>2021-05-31 00:00:00.0000000</PRIMEIROVENCIMENTO>" +
-                    "<INTERVALODIAS> </INTERVALODIAS>" +
-                    "<TIPOVALORDESPESA>2</TIPOVALORDESPESA>" +
-                    "<TIPOVALORREEMBOLSO>1</TIPOVALORREEMBOLSO>" +
-                    "<IDPARAMFIN></IDPARAMFIN>" +
-                    "<COD_PESS_EMPR> </COD_PESS_EMPR>" +
-                    "<NUM_UNID></NUM_UNID>" +
-                    "<NUM_SUB_UNID></NUM_SUB_UNID>" +
-                    "<INTERVALODIASREEMBOLSO></INTERVALODIASREEMBOLSO>" +
-                    "<ANOEXERCICIO>2021</ANOEXERCICIO>" +
-                    "<CODSEGURO></CODSEGURO>" +
-                    "<PRIMEIROVCTOREEMBOLSO>0001-01-01 00:00:00.0000000</PRIMEIROVCTOREEMBOLSO>" +
-                    "<PERIODICIDADE>1</PERIODICIDADE>" +
-                    "<PERIODICIDADEREEMBOLSO>1</PERIODICIDADEREEMBOLSO>" +
-                    "</XDESPESA>" +
-        "</ImbDespesaAluguelData>";
+            string xml = @"<ImbDespesaAluguelData xmlns='http://tempuri.org/ImbDespesaAluguelData.xsd\'> " +
+                               "<XDESPESA> " +
+                                  //Identificação
+                                  "<CODCOLIGADA>1</CODCOLIGADA> " +
+                                  "<CODDESPESA>0</CODDESPESA>" +
+                                  "<ORIGEM>1</ORIGEM> " +
+                                  //"<STATUS>0</STATUS>  " +
+                                  "<ANOEXERCICIO>2021</ANOEXERCICIO>  " +
+                                  "<COMPETENCIA>2021-05-01 00:00:00.0000000</COMPETENCIA>  " +
+
+                                  "<DESCDESPESA>" + item.EMGEA_NumContrato + "</DESCDESPESA>" +
+                                  "<NUMERODOCUMENTO>" + item.EMGEA_NumContrato + "</NUMERODOCUMENTO>  " +
+                                  "<CODTIPODESPESA>2</CODTIPODESPESA>  " +
+                                  "<CODPARAMMVTO>1</CODPARAMMVTO> " +
+                                  //Verificar de onde vem o cliente
+                                  "<CODCOLCFO>0</CODCOLCFO>  " +
+                                  "<CODCFO>F00786</CODCFO>  " +
+                                  "<CODIMOVEL>" + imovel.CODIMOVEL + "</CODIMOVEL>  " +
+                                  "<IDINSCRICAOMUNICIPAL></IDINSCRICAOMUNICIPAL>  " +
+                                  //Valor Despesa
+                                  "<TIPOVALORDESPESA>" + tipoValorDespesa + "</TIPOVALORDESPESA> " +
+                                  "<VALORAVISTA>" + item.VALOR_TOTAL_C__DESCONTO + "</VALORAVISTA>  " +
+                                  "<VALORAPRAZO>" + item.VALOR_TOTAL_IPTU_2021 + "</VALORAPRAZO> " +
+                                  "<PRIMEIROVENCIMENTO>" + item.VENCIMENTO_CONTA_ÚNICA + "</PRIMEIROVENCIMENTO>  " +
+                                  "<NUMPARCELA>" + item.N_DE_PARCELAS + "</NUMPARCELA>  " +
+                                  "<PERIODICIDADE>1</PERIODICIDADE> " +
+                                  "<INTERVALODIAS></INTERVALODIAS>  " +
+
+                               //Reembolso
+                               //"<PERMITEREEMBOLSO></PERMITEREEMBOLSO>  " +
+                               //"<CODREGRAREEMBOLSO> </CODREGRAREEMBOLSO>  " +
+                               //"<IDPARAMFIN></IDPARAMFIN>  " +
+                               //"<TIPOVALORREEMBOLSO>1</TIPOVALORREEMBOLSO>  " +
+                               //"<PRIMEIROVCTOREEMBOLSO>0001-01-01 00:00:00.0000000</PRIMEIROVCTOREEMBOLSO>  " +
+                               //"<NUMPARCELAREEMBOLSO>0</NUMPARCELAREEMBOLSO>  " +
+                               //"<PERIODICIDADEREEMBOLSO>1</PERIODICIDADEREEMBOLSO> " +
+                               //"<INTERVALODIASREEMBOLSO></INTERVALODIASREEMBOLSO> " +
+                               //Não está sendo utilizadas
+                               //"<COD_PESS_EMPR></COD_PESS_EMPR>  " +
+                               //"<NUM_UNID></NUM_UNID> " +
+                               //"<NUM_SUB_UNID></NUM_SUB_UNID>  " +
+                               //"<CODSEGURO></CODSEGURO>  " +
+                               "</XDESPESA> " +
+                            "</ImbDespesaAluguelData>";
 
             string contexto = "CODSISTEMA=G;CODCOLIGADA=1;CODUSUARIO={usuario}";
 
@@ -232,56 +348,7 @@ namespace ApiDados
         }
 
 
-        //static public void SalvarDeDespesas()
-        //{  
-
-        //    string xml = @"<ImbDespesaAluguelData xmlns='http://tempuri.org/ImbDespesaAluguelData.xsd\'>
-        //       <XDESPESA>        
-        //             <CODCOLIGADA>1</CODCOLIGADA> 
-        //             <CODDESPESA>0</CODDESPESA>
-        //        	<DESCDESPESA>Teste</DESCDESPESA>
-        //        	<ORIGEM>1</ORIGEM>
-        //        	<CODPARAMMVTO>1</CODPARAMMVTO>
-        //        	<CODTIPODESPESA>2</CODTIPODESPESA> 
-        //        	<NUMPARCELA>1</NUMPARCELA> 
-        //        	<PERMITEREEMBOLSO>f</PERMITEREEMBOLSO> 
-        //        	<CODREGRAREEMBOLSO> </CODREGRAREEMBOLSO> 
-        //        	<NUMPARCELAREEMBOLSO>0</NUMPARCELAREEMBOLSO> 
-        //        	<CODCOLCFO>0</CODCOLCFO> 
-        //        	<CODCFO>F00786</CODCFO>                   
-        //        	<CODIMOVEL>2</CODIMOVEL> 
-        //        	<IDINSCRICAOMUNICIPAL></IDINSCRICAOMUNICIPAL> 
-        //        	<COMPETENCIA>2021-05-01 00:00:00.0000000</COMPETENCIA> 
-        //        	<STATUS>0</STATUS> 
-        //        	<NUMERODOCUMENTO>I20210000001</NUMERODOCUMENTO> 
-        //        	<VALORAVISTA>1000.0000</VALORAVISTA> 
-        //        	<VALORAPRAZO>1200.0000</VALORAPRAZO>
-        //        	<PRIMEIROVENCIMENTO>2021-05-31 00:00:00.0000000</PRIMEIROVENCIMENTO> 
-        //            <INTERVALODIAS> </INTERVALODIAS> 
-        //        	<TIPOVALORDESPESA>2</TIPOVALORDESPESA>
-        //        	<TIPOVALORREEMBOLSO>1</TIPOVALORREEMBOLSO> 
-        //        	<IDPARAMFIN></IDPARAMFIN> 
-        //        	<COD_PESS_EMPR> </COD_PESS_EMPR> 
-        //        	<NUM_UNID></NUM_UNID>
-        //        	<NUM_SUB_UNID></NUM_SUB_UNID> 
-        //        	<INTERVALODIASREEMBOLSO></INTERVALODIASREEMBOLSO>
-        //        	<ANOEXERCICIO>2021</ANOEXERCICIO> 
-        //        	<CODSEGURO></CODSEGURO> 
-        //        	<PRIMEIROVCTOREEMBOLSO>0001-01-01 00:00:00.0000000</PRIMEIROVCTOREEMBOLSO> 
-        //            <PERIODICIDADE>1</PERIODICIDADE>
-        //        	<PERIODICIDADEREEMBOLSO>1</PERIODICIDADEREEMBOLSO>
-        //    </XDESPESA>  
-        //</ImbDespesaAluguelData>";         
-
-        //    string contexto = "CODSISTEMA=G;CODCOLIGADA=1;CODUSUARIO={usuario}";
-
-        //    DataClient dataclient = new DataClient(url, contexto, usuario, senha);
-
-        //    string[] retorno = dataclient.SaveRecord("ImbDespesaAluguelData", xml);
-
-        //    Console.WriteLine(retorno[0].ToString());
-        //    Console.Read();
-        //}
+     
 
         /*============================================ LANÇAMENTOS FINANCEIROS ====================================================================*/
         static public void VisualizarLancamentosFinanceiros()
@@ -662,8 +729,117 @@ namespace ApiDados
         //}
 
 
+
+        //static public void SalvarDeDespesas(tblCargaImoveisDadosCompletosDespesas202105311 item)
+        //{
+
+        //    string xml = @"<ImbDespesaAluguelData xmlns='http://tempuri.org/ImbDespesaAluguelData.xsd\'>
+        //       <XDESPESA>" +
+        //            "<CODCOLIGADA>1 </CODCOLIGADA>" +
+        //            "<CODDESPESA>0</CODDESPESA>" +
+        //            "<DESCDESPESA>" + item.BAIRRO + "</DESCDESPESA>" +
+        //            "<ORIGEM>1</ORIGEM>" +
+        //            "<CODPARAMMVTO>1</CODPARAMMVTO>" +
+        //            "<CODTIPODESPESA>2</CODTIPODESPESA>" +
+        //            "<NUMPARCELA>1</NUMPARCELA>" +
+        //            "<PERMITEREEMBOLSO>f</PERMITEREEMBOLSO>" +
+        //            "<CODREGRAREEMBOLSO> </CODREGRAREEMBOLSO>" +
+        //            "<NUMPARCELAREEMBOLSO>0</NUMPARCELAREEMBOLSO>" +
+        //            "<CODCOLCFO>0</CODCOLCFO>" +
+        //            "<CODCFO>F00786</CODCFO>" +
+        //            "<CODIMOVEL>2</CODIMOVEL>" +
+        //            "<IDINSCRICAOMUNICIPAL></IDINSCRICAOMUNICIPAL>" +
+        //            "<COMPETENCIA>2021-05-01 00:00:00.0000000</COMPETENCIA>" +
+        //            "<STATUS>0</STATUS>" +
+        //            "<NUMERODOCUMENTO>" + item.EMGEA_NumContrato + "</NUMERODOCUMENTO>" +
+        //            "<VALORAVISTA>1000.0000</VALORAVISTA>" +
+        //            "<VALORAPRAZO>1200.0000</VALORAPRAZO>" +
+        //            "<PRIMEIROVENCIMENTO>2021-05-31 00:00:00.0000000</PRIMEIROVENCIMENTO>" +
+        //            "<INTERVALODIAS> </INTERVALODIAS>" +
+        //            "<TIPOVALORDESPESA>2</TIPOVALORDESPESA>" +
+        //            "<TIPOVALORREEMBOLSO>1</TIPOVALORREEMBOLSO>" +
+        //            "<IDPARAMFIN></IDPARAMFIN>" +
+        //            "<COD_PESS_EMPR> </COD_PESS_EMPR>" +
+        //            "<NUM_UNID></NUM_UNID>" +
+        //            "<NUM_SUB_UNID></NUM_SUB_UNID>" +
+        //            "<INTERVALODIASREEMBOLSO></INTERVALODIASREEMBOLSO>" +
+        //            "<ANOEXERCICIO>2021</ANOEXERCICIO>" +
+        //            "<CODSEGURO></CODSEGURO>" +
+        //            "<PRIMEIROVCTOREEMBOLSO>0001-01-01 00:00:00.0000000</PRIMEIROVCTOREEMBOLSO>" +
+        //            "<PERIODICIDADE>1</PERIODICIDADE>" +
+        //            "<PERIODICIDADEREEMBOLSO>1</PERIODICIDADEREEMBOLSO>" +
+        //            "</XDESPESA>" +
+        //"</ImbDespesaAluguelData>";
+
+        //    string contexto = "CODSISTEMA=G;CODCOLIGADA=1;CODUSUARIO={usuario}";
+
+        //    DataClient dataclient = new DataClient(url, contexto, usuario, senha);
+
+        //    string[] retorno = dataclient.SaveRecord("ImbDespesaAluguelData", xml);
+
+        //    Console.WriteLine(retorno[0].ToString());
+        //    Console.Read();
+        //}
+
+
+
+        //static public void SalvarDeDespesas()
+        //{  
+
+        //    string xml = @"<ImbDespesaAluguelData xmlns='http://tempuri.org/ImbDespesaAluguelData.xsd\'>
+        //       <XDESPESA>        
+        //             <CODCOLIGADA>1</CODCOLIGADA> 
+        //             <CODDESPESA>0</CODDESPESA>
+        //        	<DESCDESPESA>Teste</DESCDESPESA>
+        //        	<ORIGEM>1</ORIGEM>
+        //        	<CODPARAMMVTO>1</CODPARAMMVTO>
+        //        	<CODTIPODESPESA>2</CODTIPODESPESA> 
+        //        	<NUMPARCELA>1</NUMPARCELA> 
+        //        	<PERMITEREEMBOLSO>f</PERMITEREEMBOLSO> 
+        //        	<CODREGRAREEMBOLSO> </CODREGRAREEMBOLSO> 
+        //        	<NUMPARCELAREEMBOLSO>0</NUMPARCELAREEMBOLSO> 
+        //        	<CODCOLCFO>0</CODCOLCFO> 
+        //        	<CODCFO>F00786</CODCFO>                   
+        //        	<CODIMOVEL>2</CODIMOVEL> 
+        //        	<IDINSCRICAOMUNICIPAL></IDINSCRICAOMUNICIPAL> 
+        //        	<COMPETENCIA>2021-05-01 00:00:00.0000000</COMPETENCIA> 
+        //        	<STATUS>0</STATUS> 
+        //        	<NUMERODOCUMENTO>I20210000001</NUMERODOCUMENTO> 
+        //        	<VALORAVISTA>1000.0000</VALORAVISTA> 
+        //        	<VALORAPRAZO>1200.0000</VALORAPRAZO>
+        //        	<PRIMEIROVENCIMENTO>2021-05-31 00:00:00.0000000</PRIMEIROVENCIMENTO> 
+        //            <INTERVALODIAS> </INTERVALODIAS> 
+        //        	<TIPOVALORDESPESA>2</TIPOVALORDESPESA>
+        //        	<TIPOVALORREEMBOLSO>1</TIPOVALORREEMBOLSO> 
+        //        	<IDPARAMFIN></IDPARAMFIN> 
+        //        	<COD_PESS_EMPR> </COD_PESS_EMPR> 
+        //        	<NUM_UNID></NUM_UNID>
+        //        	<NUM_SUB_UNID></NUM_SUB_UNID> 
+        //        	<INTERVALODIASREEMBOLSO></INTERVALODIASREEMBOLSO>
+        //        	<ANOEXERCICIO>2021</ANOEXERCICIO> 
+        //        	<CODSEGURO></CODSEGURO> 
+        //        	<PRIMEIROVCTOREEMBOLSO>0001-01-01 00:00:00.0000000</PRIMEIROVCTOREEMBOLSO> 
+        //            <PERIODICIDADE>1</PERIODICIDADE>
+        //        	<PERIODICIDADEREEMBOLSO>1</PERIODICIDADEREEMBOLSO>
+        //    </XDESPESA>  
+        //</ImbDespesaAluguelData>";         
+
+        //    string contexto = "CODSISTEMA=G;CODCOLIGADA=1;CODUSUARIO={usuario}";
+
+        //    DataClient dataclient = new DataClient(url, contexto, usuario, senha);
+
+        //    string[] retorno = dataclient.SaveRecord("ImbDespesaAluguelData", xml);
+
+        //    Console.WriteLine(retorno[0].ToString());
+        //    Console.Read();
+        //}
+
+
+
     }
 }
+
+
 
 
 

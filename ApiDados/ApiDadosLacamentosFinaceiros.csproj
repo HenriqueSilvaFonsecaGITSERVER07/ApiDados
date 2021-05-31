@@ -59,6 +59,11 @@
       <DesignTime>True</DesignTime>
       <DependentUpon>Despesas.dbml</DependentUpon>
     </Compile>
+    <Compile Include="Imoveis.designer.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>Imoveis.dbml</DependentUpon>
+    </Compile>
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Properties\Settings.Designer.cs">
@@ -90,6 +95,14 @@
     </None>
     <None Include="Despesas.dbml.layout">
       <DependentUpon>Despesas.dbml</DependentUpon>
+    </None>
+    <None Include="Imoveis.dbml">
+      <Generator>MSLinqToSQLGenerator</Generator>
+      <LastGenOutput>Imoveis.designer.cs</LastGenOutput>
+      <SubType>Designer</SubType>
+    </None>
+    <None Include="Imoveis.dbml.layout">
+      <DependentUpon>Imoveis.dbml</DependentUpon>
     </None>
     <None Include="Properties\Settings.settings">
       <Generator>SettingsSingleFileGenerator</Generator>
