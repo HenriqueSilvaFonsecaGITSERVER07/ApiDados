@@ -65,7 +65,7 @@ namespace ApiDados
 
             ImoveisDataContext dbImoveis = new ImoveisDataContext();
 
-            List<tblCargaImoveisDadosCompletosDespesas202105311> listaDespesas = dbDespesas.tblCargaImoveisDadosCompletosDespesas202105311s.Take(230).ToList();
+            List<tblCargaImoveisDadosCompletosDespesas202105311> listaDespesas = dbDespesas.tblCargaImoveisDadosCompletosDespesas202105311s.Take(1000).ToList();
 
             foreach (var item in listaDespesas)
             {
@@ -330,7 +330,7 @@ namespace ApiDados
             string[] retorno = dataclient.SaveRecord("ImbDespesaAluguelData", xml);
 
             Console.WriteLine(retorno[0].ToString());
-            Console.Read();
+            //Console.Read();
         }     
 
         /*============================================ LANÇAMENTOS FINANCEIROS ====================================================================*/
