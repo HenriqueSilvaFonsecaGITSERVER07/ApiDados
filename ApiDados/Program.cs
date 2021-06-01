@@ -44,32 +44,19 @@ namespace ApiDados
             ////SalvarLacamentoFinanceiro();
             ////AtualizaRecordLancamentoFinanceiro();           
             InserirDespesasImoveis();
+
         }
 
 
         static public void InserirDespesasImoveis()
         {
-            string contexto = "CODSISTEMA=G;CODCOLIGADA=1;CODUSUARIO={usuario}";
-
-            //o filtro pode ser qualquer campo da visão, por exemplo CODCOLIGADA=1 AND CODFILIAL = 1  
-            string filtro = "1=1";
-
-            string recordData;
-
-            // Retorna as credenciais para acesso ao WS  
-            DataClient dataclient = new DataClient(url, contexto, usuario, senha);
-            // lê os dados da visão respeitando o filtro passado  
-            DataSet ds = dataclient.ReadView("ImbDespesaAluguelData", filtro, out recordData);
-
-            var result = ds.Tables[0].AsEnumerable().ToList();
-
             DespesasDataContext dbDespesas = new DespesasDataContext();
 
             ImoveisDataContext dbImoveis = new ImoveisDataContext();
 
             XdespesasSuapDataContext XdespesasSuap = new XdespesasSuapDataContext();
 
-            List<tblCargaImoveisDadosCompletosDespesas202105311> listaDespesas = dbDespesas.tblCargaImoveisDadosCompletosDespesas202105311s.Take(100).ToList();
+            List<tblCargaImoveisDadosCompletosDespesas202105311> listaDespesas = dbDespesas.tblCargaImoveisDadosCompletosDespesas202105311s.Take(200).ToList();
 
             List<XDESPESA> listaDespesaImoveis = XdespesasSuap.XDESPESAs.ToList();
 
@@ -92,42 +79,53 @@ namespace ApiDados
 
                     var listaImoveis = dbImoveis.XALGIMOVELs.Where(x => x.DESCIMOVEL.Equals(item.EMGEA_NumContrato)).ToList();
 
-                    if (listaImoveis.Count == 1)
+                    if (item.VALOR_TOTAL_C__DESCONTO > 0 || item.N_DE_PARCELAS > 0)
                     {
-                        if (item.N_DE_PARCELAS > 1)
+                        if (listaImoveis.Count == 1)
                         {
-                            tipoValorDespesa = 2;
+                            if (item.N_DE_PARCELAS > 1)
+                            {
+                                tipoValorDespesa = 2;
+                            }
+                            var imovel = listaImoveis.FirstOrDefault();
+
+                            SalvarDeDespesas(item, imovel, tipoValorDespesa);
+
                         }
-                        var imovel = listaImoveis.FirstOrDefault();
-
-                        SalvarDeDespesas(item, imovel, tipoValorDespesa);
-
-                    }
-                    else if (listaImoveis.Count > 1)
-                    {
-                        using (StreamWriter w = File.AppendText("Log _error.txt"))
+                        else if (listaImoveis.Count > 1)
                         {
+                            using (StreamWriter w = File.AppendText("Log _error.txt"))
+                            {
+                                Console.ForegroundColor = ConsoleColor.Red;
+                                Log("Existe mais de um imóvel para esse número de contrato " + item.EMGEA_NumContrato, w);
+                            }
+
                             Console.ForegroundColor = ConsoleColor.Red;
-                            Log("Existe mais de um imóvel para esse número de contrato " + item.EMGEA_NumContrato, w);
+                            Console.WriteLine($"{DateTime.Now.ToLongTimeString()} {DateTime.Now.ToLongDateString()}");
+                            Console.WriteLine("Existe mais de um imóvel para esse número de contrato: " + item.EMGEA_NumContrato);
+                            Console.WriteLine("--------------------------------------------------------------");
                         }
+                        else
+                        {
+                            using (StreamWriter w = File.AppendText("log.txt"))
+                            {
+                                Log("Não existe um imóvel cadastrado com esse número de contrato: " + item.EMGEA_NumContrato, w);
+                            }
 
-                        Console.ForegroundColor = ConsoleColor.Red;
-                        Console.WriteLine($"{DateTime.Now.ToLongTimeString()} {DateTime.Now.ToLongDateString()}");
-                        Console.WriteLine("Existe mais de um imóvel para esse número de contrato: " + item.EMGEA_NumContrato);
-                        Console.WriteLine("--------------------------------------------------------------");
+                            Console.ForegroundColor = ConsoleColor.Red;
+                            Console.WriteLine($"{DateTime.Now.ToLongTimeString()} {DateTime.Now.ToLongDateString()}");
+                            Console.WriteLine("Não existe um imóvel cadastrado com esse número de contrato: " + item.EMGEA_NumContrato);
+                            Console.WriteLine("--------------------------------------------------------------");
+                        }
                     }
                     else
                     {
-                        using (StreamWriter w = File.AppendText("log.txt"))
-                        {
-                            Log("Não existe um imóvel cadastrado com esse número de contrato: " + item.EMGEA_NumContrato, w);
-                        }
-
-                        Console.ForegroundColor = ConsoleColor.Red;
+                        Console.ForegroundColor = ConsoleColor.White;
                         Console.WriteLine($"{DateTime.Now.ToLongTimeString()} {DateTime.Now.ToLongDateString()}");
-                        Console.WriteLine("Não existe um imóvel cadastrado com esse número de contrato: " + item.EMGEA_NumContrato);
+                        Console.WriteLine("Não existem valores preenchidos para o contrato " + item.EMGEA_NumContrato);
                         Console.WriteLine("--------------------------------------------------------------");
                     }
+
                 }
 
             }
@@ -137,13 +135,7 @@ namespace ApiDados
             Console.WriteLine("Finalizado");
             Console.WriteLine("Foram inseridos " + counter + " novos registros!");
             Console.WriteLine("--------------------------------------------------------------");
-            Console.Read();
-
-            //Console.ForegroundColor = ConsoleColor.Green;
-            //Console.WriteLine($"{DateTime.Now.ToLongTimeString()} {DateTime.Now.ToLongDateString()}");
-            //Console.WriteLine("Finalizado");
-            //Console.WriteLine("--------------------------------------------------------------");
-            //Console.Read();
+            Console.Read();           
         }
 
         public static void Log(string logMessage, TextWriter w)
@@ -318,7 +310,6 @@ namespace ApiDados
                                   "<NUMPARCELA>" + item.N_DE_PARCELAS + "</NUMPARCELA>  " +
                                   "<PERIODICIDADE>1</PERIODICIDADE> " +
                                   "<INTERVALODIAS></INTERVALODIAS>  " +
-
                                   //Reembolso
                                   //"<PERMITEREEMBOLSO></PERMITEREEMBOLSO>  " +
                                   //"<CODREGRAREEMBOLSO> </CODREGRAREEMBOLSO>  " +
@@ -342,7 +333,6 @@ namespace ApiDados
 
             string[] retorno = dataclient.SaveRecord("ImbDespesaAluguelData", xml);
 
-
             counter++;
 
             using (StreamWriter w = File.AppendText("Log registros inseridos.txt"))
@@ -354,7 +344,6 @@ namespace ApiDados
             //Console.WriteLine($"{DateTime.Now.ToLongTimeString()} {DateTime.Now.ToLongDateString()}");
             //Console.WriteLine("Foi inserido " + retorno[0].ToString() + " depesa para o imóvel " + imovel.CODIMOVEL);
             //Console.WriteLine("--------------------------------------------------------------");
-
 
             //Console.WriteLine(retorno[0].ToString());
 
@@ -441,9 +430,7 @@ namespace ApiDados
                 <CODFILIAL>1</CODFILIAL>  
                 <SERIEDOCUMENTO>@@@</SERIEDOCUMENTO>  
                 <TIPOCONTABILLAN>0</TIPOCONTABILLAN>  
-
                 <HISTORICO>Cadastro 2021 lançamentos</HISTORICO>
-
                 <CODMOEVALORORIGINAL>R$</CODMOEVALORORIGINAL>  
                 <LIBAUTORIZADA>0</LIBAUTORIZADA>  
                 <STATUSEXPORTACAO>0</STATUSEXPORTACAO>  
@@ -704,7 +691,6 @@ namespace ApiDados
             Console.WriteLine(retorno[0].ToString());
             Console.Read();
         }
-
 
         //static public void metododeteste()
         //{
