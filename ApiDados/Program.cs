@@ -19,6 +19,8 @@ namespace ApiDados
         static string url = "http://agamenon.emgea.ativos:8051";
         static string usuario = "x000417";
         static string senha = "Brasil07";
+        static int counter = 0;
+
         static void Main(string[] args)
         {
             //DespesasDataContext dados = new DespesasDataContext();
@@ -65,15 +67,19 @@ namespace ApiDados
 
             ImoveisDataContext dbImoveis = new ImoveisDataContext();
 
-            List<tblCargaImoveisDadosCompletosDespesas202105311> listaDespesas = dbDespesas.tblCargaImoveisDadosCompletosDespesas202105311s.Take(1000).ToList();
+            XdespesasSuapDataContext XdespesasSuap = new XdespesasSuapDataContext();
+
+            List<tblCargaImoveisDadosCompletosDespesas202105311> listaDespesas = dbDespesas.tblCargaImoveisDadosCompletosDespesas202105311s.Take(100).ToList();
+
+            List<XDESPESA> listaDespesaImoveis = XdespesasSuap.XDESPESAs.ToList();
 
             foreach (var item in listaDespesas)
             {
-                //var verificaCadastroDuplicado = result.Select(x => x.ItemArray[2].Equals(item.EMGEA_NumContrato)).FirstOrDefault();
+                var verificaCadastroDuplicado = listaDespesaImoveis.Where(x => x.DESCDESPESA.Contains(item.EMGEA_NumContrato.ToString())).FirstOrDefault();
 
-                var verificaCadastroDuplicado = result.Select(x => x.ItemArray[2].Equals(item.EMGEA_NumContrato.ToString())).FirstOrDefault();
+                //var verificaCadastroDuplicado = result.Select(x => x.ItemArray[2].Equals(item.EMGEA_NumContrato.ToString())).FirstOrDefault();
 
-                if (verificaCadastroDuplicado)
+                if (verificaCadastroDuplicado != null)
                 {
                     Console.ForegroundColor = ConsoleColor.Yellow;
                     Console.WriteLine($"{DateTime.Now.ToLongTimeString()} {DateTime.Now.ToLongDateString()}");
@@ -101,6 +107,7 @@ namespace ApiDados
                     {
                         using (StreamWriter w = File.AppendText("Log _error.txt"))
                         {
+                            Console.ForegroundColor = ConsoleColor.Red;
                             Log("Existe mais de um imóvel para esse número de contrato " + item.EMGEA_NumContrato, w);
                         }
 
@@ -128,8 +135,15 @@ namespace ApiDados
             Console.ForegroundColor = ConsoleColor.Green;
             Console.WriteLine($"{DateTime.Now.ToLongTimeString()} {DateTime.Now.ToLongDateString()}");
             Console.WriteLine("Finalizado");
+            Console.WriteLine("Foram inseridos " + counter + " novos registros!");
             Console.WriteLine("--------------------------------------------------------------");
             Console.Read();
+
+            //Console.ForegroundColor = ConsoleColor.Green;
+            //Console.WriteLine($"{DateTime.Now.ToLongTimeString()} {DateTime.Now.ToLongDateString()}");
+            //Console.WriteLine("Finalizado");
+            //Console.WriteLine("--------------------------------------------------------------");
+            //Console.Read();
         }
 
         public static void Log(string logMessage, TextWriter w)
@@ -287,7 +301,6 @@ namespace ApiDados
                                   //"<STATUS>0</STATUS>  " +
                                   "<ANOEXERCICIO>2021</ANOEXERCICIO>  " +
                                   "<COMPETENCIA>2021-05-01 00:00:00.0000000</COMPETENCIA>  " +
-
                                   "<DESCDESPESA>" + item.EMGEA_NumContrato + "</DESCDESPESA>" +
                                   "<NUMERODOCUMENTO>" + item.EMGEA_NumContrato + "</NUMERODOCUMENTO>  " +
                                   "<CODTIPODESPESA>2</CODTIPODESPESA>  " +
@@ -306,21 +319,21 @@ namespace ApiDados
                                   "<PERIODICIDADE>1</PERIODICIDADE> " +
                                   "<INTERVALODIAS></INTERVALODIAS>  " +
 
-                               //Reembolso
-                               //"<PERMITEREEMBOLSO></PERMITEREEMBOLSO>  " +
-                               //"<CODREGRAREEMBOLSO> </CODREGRAREEMBOLSO>  " +
-                               //"<IDPARAMFIN></IDPARAMFIN>  " +
-                               //"<TIPOVALORREEMBOLSO>1</TIPOVALORREEMBOLSO>  " +
-                               //"<PRIMEIROVCTOREEMBOLSO>0001-01-01 00:00:00.0000000</PRIMEIROVCTOREEMBOLSO>  " +
-                               //"<NUMPARCELAREEMBOLSO>0</NUMPARCELAREEMBOLSO>  " +
-                               //"<PERIODICIDADEREEMBOLSO>1</PERIODICIDADEREEMBOLSO> " +
-                               //"<INTERVALODIASREEMBOLSO></INTERVALODIASREEMBOLSO> " +
-                               //Não está sendo utilizadas
-                               //"<COD_PESS_EMPR></COD_PESS_EMPR>  " +
-                               //"<NUM_UNID></NUM_UNID> " +
-                               //"<NUM_SUB_UNID></NUM_SUB_UNID>  " +
-                               //"<CODSEGURO></CODSEGURO>  " +
-                               "</XDESPESA> " +
+                                  //Reembolso
+                                  //"<PERMITEREEMBOLSO></PERMITEREEMBOLSO>  " +
+                                  //"<CODREGRAREEMBOLSO> </CODREGRAREEMBOLSO>  " +
+                                  //"<IDPARAMFIN></IDPARAMFIN>  " +
+                                  //"<TIPOVALORREEMBOLSO>1</TIPOVALORREEMBOLSO>  " +
+                                  //"<PRIMEIROVCTOREEMBOLSO>0001-01-01 00:00:00.0000000</PRIMEIROVCTOREEMBOLSO>  " +
+                                  //"<NUMPARCELAREEMBOLSO>0</NUMPARCELAREEMBOLSO>  " +
+                                  //"<PERIODICIDADEREEMBOLSO>1</PERIODICIDADEREEMBOLSO> " +
+                                  //"<INTERVALODIASREEMBOLSO></INTERVALODIASREEMBOLSO> " +
+                                  //Não está sendo utilizadas
+                                  //"<COD_PESS_EMPR></COD_PESS_EMPR>  " +
+                                  //"<NUM_UNID></NUM_UNID> " +
+                                  //"<NUM_SUB_UNID></NUM_SUB_UNID>  " +
+                                  //"<CODSEGURO></CODSEGURO>  " +
+                                  "</XDESPESA> " +
                             "</ImbDespesaAluguelData>";
 
             string contexto = "CODSISTEMA=G;CODCOLIGADA=1;CODUSUARIO={usuario}";
@@ -329,9 +342,24 @@ namespace ApiDados
 
             string[] retorno = dataclient.SaveRecord("ImbDespesaAluguelData", xml);
 
-            Console.WriteLine(retorno[0].ToString());
+
+            counter++;
+
+            using (StreamWriter w = File.AppendText("Log registros inseridos.txt"))
+            {
+                Log("Foi inserido 1 despesa para o imóvel : " + imovel.CODIMOVEL, w);
+            }
+
+            //Console.ForegroundColor = ConsoleColor.Green;
+            //Console.WriteLine($"{DateTime.Now.ToLongTimeString()} {DateTime.Now.ToLongDateString()}");
+            //Console.WriteLine("Foi inserido " + retorno[0].ToString() + " depesa para o imóvel " + imovel.CODIMOVEL);
+            //Console.WriteLine("--------------------------------------------------------------");
+
+
+            //Console.WriteLine(retorno[0].ToString());
+
             //Console.Read();
-        }     
+        }
 
         /*============================================ LANÇAMENTOS FINANCEIROS ====================================================================*/
         static public void VisualizarLancamentosFinanceiros()

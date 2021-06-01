@@ -72,6 +72,11 @@
       <DependentUpon>Settings.settings</DependentUpon>
     </Compile>
     <Compile Include="Utils.cs" />
+    <Compile Include="XdespesasSuap.designer.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>XdespesasSuap.dbml</DependentUpon>
+    </Compile>
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config" />
@@ -107,6 +112,14 @@
     <None Include="Properties\Settings.settings">
       <Generator>SettingsSingleFileGenerator</Generator>
       <LastGenOutput>Settings.Designer.cs</LastGenOutput>
+    </None>
+    <None Include="XdespesasSuap.dbml">
+      <Generator>MSLinqToSQLGenerator</Generator>
+      <LastGenOutput>XdespesasSuap.designer.cs</LastGenOutput>
+      <SubType>Designer</SubType>
+    </None>
+    <None Include="XdespesasSuap.dbml.layout">
+      <DependentUpon>XdespesasSuap.dbml</DependentUpon>
     </None>
   </ItemGroup>
   <ItemGroup>

@@ -1,0 +1,12 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<ordesignerObjectsDiagram dslVersion="1.0.0.0" absoluteBounds="0, 0, 11, 8.625" name="XdespesasSuap">
+  <DataContextMoniker Name="/XdespesasSuapDataContext" />
+  <nestedChildShapes>
+    <classShape Id="7a1ac802-8ed6-4b98-a38a-119faf6664c4" absoluteBounds="4.625, 0.5, 2, 7.9245426432291648">
+      <DataClassMoniker Name="/XdespesasSuapDataContext/XDESPESA" />
+      <nestedChildShapes>
+        <elementListCompartment Id="0e4adc6c-79b1-4286-9260-e5e4d2fadde1" absoluteBounds="4.64, 0.96, 1.9700000000000002, 7.3645426432291661" name="DataPropertiesCompartment" titleTextColor="Black" itemTextColor="Black" />
+      </nestedChildShapes>
+    </classShape>
+  </nestedChildShapes>
+</ordesignerObjectsDiagram>
