@@ -127,7 +127,6 @@ namespace ApiDados
             }
         }
 
-
         /// <summary>
         /// Salva os dados do registro do DataServer
         /// </summary>
@@ -193,7 +192,6 @@ namespace ApiDados
 
             return httpRequestProperty;
         }
-
 
         private DataServer.IwsDataServerClient CreateClient(string serverAddress, string userName, string password)
         {

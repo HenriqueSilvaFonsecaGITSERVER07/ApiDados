@@ -36,19 +36,16 @@ namespace ApiDados
             ///*IMOVEL*/
             //ReadView();
             ////ReadRecord();          
-            ////SalvarImovel();
-
+            //SalvarImovel();
 
             ////SalvarDeDespesas();
             //VisualizarDespesa();
             InserirDespesasImoveis();
 
-
             ///*Lançamentos Financeiros*/
             ////VisualizarLancamentosFinanceiros();
             ////SalvarLacamentoFinanceiro();
-            ////AtualizaRecordLancamentoFinanceiro();           
-
+            ////AtualizaRecordLancamentoFinanceiro();          
 
         }
 
@@ -61,7 +58,7 @@ namespace ApiDados
 
             XdespesasSuapDataContext XdespesasSuap = new XdespesasSuapDataContext();
 
-            List<tblCargaImoveisDadosCompletosDespesas202105311> listaDespesas = dbDespesas.tblCargaImoveisDadosCompletosDespesas202105311s.Take(76).ToList();
+            List<tblCargaImoveisDadosCompletosDespesas202105311> listaDespesas = dbDespesas.tblCargaImoveisDadosCompletosDespesas202105311s.Take(2332).ToList();
 
             List<XDESPESA> listaDespesaImoveis = XdespesasSuap.XDESPESAs.ToList();
 
@@ -317,6 +314,9 @@ namespace ApiDados
                                   "<NUMPARCELA>" + item.N_DE_PARCELAS + "</NUMPARCELA>  " +
                                   "<PERIODICIDADE>1</PERIODICIDADE> " +
                                   "<INTERVALODIAS></INTERVALODIAS>  " +
+
+                                  //"<NUMEROPARCELA>" + item.N_DE_PARCELAS + "</NUMEROPARECELAS> " +
+
                                   //Reembolso
                                   //"<PERMITEREEMBOLSO></PERMITEREEMBOLSO>  " +
                                   //"<CODREGRAREEMBOLSO> </CODREGRAREEMBOLSO>  " +
@@ -331,6 +331,7 @@ namespace ApiDados
                                   //"<NUM_UNID></NUM_UNID> " +
                                   //"<NUM_SUB_UNID></NUM_SUB_UNID>  " +
                                   //"<CODSEGURO></CODSEGURO>  " +
+
                                   "</XDESPESA> " +
                             "</ImbDespesaAluguelData>";
 
@@ -346,6 +347,7 @@ namespace ApiDados
             {
                 Log("Foi inserido 1 despesa para o imóvel : " + imovel.CODIMOVEL, w);
             }
+
 
             Console.ForegroundColor = ConsoleColor.Green;
             Console.WriteLine($"{DateTime.Now.ToLongTimeString()} {DateTime.Now.ToLongDateString()}");
